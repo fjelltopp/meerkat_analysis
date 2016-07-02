@@ -4,6 +4,25 @@ import csv
 import json
 
 
+def name_id(name=None, var_id=None, variables=None):
+    """
+    Returns the id of the variable
+
+    Args: 
+        var_id: variable_id
+        name: Variable name
+        variables
+    """
+
+    if var_id is not None:
+        return var_id
+    elif name is not None:
+        if variables is None:
+            raise KeyError("Need to provide variables")
+        return variables.get_id(name)
+    else:
+        raise KeyError("Need to provide either name or id")
+
 def download_file(url, filename, params=None):
     """
     Download an url and saves it as file
@@ -115,6 +134,22 @@ class Variables:
         else:
             return None
 
+    def get_id(self, name):
+        """ Get variable id by name
+        
+        Args:
+            name: name of variable
+        """
+        ret = []
+        for v in self.variables.values():
+            if name == v["name"]:
+                ret.append(v["id"])
+        if len(ret) == 1:
+            return ret[0]
+        else:
+            return None
+
+        
 class LiveDownloader:
     """
     A class to download data from the live site

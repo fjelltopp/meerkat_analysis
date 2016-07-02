@@ -39,7 +39,7 @@ class UtilTest(unittest.TestCase):
         new_v = util.load_from_json_file("test.test")
         self.assertEqual(v, new_v)
         os.remove("test.test")
-    
+
 class VariablesTest(unittest.TestCase):
     """ Testing the Variable class """
     def setUp(self):
@@ -49,6 +49,7 @@ class VariablesTest(unittest.TestCase):
                           "id_2": {"name": "Test 2",
                                    "category": ["test1", "test2"],
                                    "id": "id_2"}
+
         }
     def test_init(self):
         """ Test various init methods """
@@ -86,9 +87,16 @@ class VariablesTest(unittest.TestCase):
         v = util.Variables.from_csv_file("test.test")
         self.assertEqual(v.variables, self.variables)
         os.remove("test.test")
+
     def test_get_name(self):
         v = util.Variables(self.variables)
         self.assertEqual(v.name("id_1"), "Test 1")
+    def test_get_id(self):
+        v = util.Variables(self.variables)
+        self.assertEqual(v.get_id("Test 1"), "id_1")
+        self.assertEqual(v.get_id("Test 2"), "id_2")
+        self.assertEqual(v.get_id("Does not exisit"), None)
+        
 
 class LiveDownloaderTest(unittest.TestCase):
     """ Test LiveDownloader class """

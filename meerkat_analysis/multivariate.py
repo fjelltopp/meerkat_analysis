@@ -78,3 +78,15 @@ def incidence_rate_by_category(data, category, variables, populations=None, var_
             incidence_rate = univariate.incidence_rate(group_data, var_id=var_id, name=name, variables=variables)
         ret.loc[variables.name(group)] = [incidence_rate[0], incidence_rate[0]-incidence_rate[1][0], incidence_rate[1][1]-incidence_rate[0]]
     return ret
+
+
+def plot_incidece_rate(incidence_rates):
+    """
+    Plot a bar chart of incidece rates with error bars
+
+    Args: 
+        incidence_rates: data frame with incidence rates
+
+    """
+    error = np.array(incidence_rates[["ci_lower", "ci_upper"]])
+    incidence_rates["incidence_rate"].plot(kind="bar",yerr=error.transpose())

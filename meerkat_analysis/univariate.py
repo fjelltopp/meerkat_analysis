@@ -1,7 +1,8 @@
 import pandas as pd
-from . import util
 from statsmodels.stats import proportion
+from matplotlib import pylab
 
+from . import util
 def breakdown_by_category(variables, category, data, use_names=True):
     """
     Gives a breakdown of data for category
@@ -56,4 +57,3 @@ def incidence_rate(data, population=None, var_id=None, name=None, variables=None
     confidence_interval = proportion.proportion_confint(count, population, method="wilson")
     return (incidence, confidence_interval)
 
-        

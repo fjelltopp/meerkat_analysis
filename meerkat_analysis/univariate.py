@@ -45,6 +45,7 @@ def incidence_rate(data, population=None, var_id=None, name=None, variables=None
     """
 
     var_id = util.name_id(var_id=var_id, name=name, variables=variables)
+    
 
     if var_id not in data.columns:
         return (0, (0,0))

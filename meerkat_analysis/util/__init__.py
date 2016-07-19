@@ -149,6 +149,67 @@ class Variables:
         else:
             return None
 
+class Locations:
+    """
+    A class to keep location data
+
+    """
+    def __init__(self, locations):
+        self.locations = locations
+    @classmethod
+    def from_json_file(cls, filename):
+        """ Initilises the class from a json file
+        Args:
+           filename: name of file
+        """
+        return cls(load_from_json_file(filename))
+    
+    @classmethod
+    def from_url(cls, live_downloader, filename):
+        """
+        Will download variables from the live_downloade and initialise the class with those. Filename stores the variabels
+
+        Args: 
+            live_downloader: live downloader class
+            filename: filename to store the variables
+        """
+        live_downloader.download_locations(filename)
+        return cls(load_from_json_file(filename))
+
+    def population(self, loc_id):
+        """
+        Returns the population
+        """
+        return self.locations[loc_id]["population"]
+
+    def loc_id_from_name(self, name, district):
+        """ 
+        Returns a location id from a name and district
+        """
+        for l in self.locations.values():
+            if l["name"] == name and l["district"] == district:
+                return l["id"]
+        return None
+    def name(self, loc_id):
+        """
+        Returns the name of the location
+        """
+        return self.locations[loc_id]["name"]
+    def get_level(self, level, only_case_report=True):
+        """
+        Returns all the locations with the correct level
+        """
+        ret = []
+        if level != "clinic" and not only_case_report:
+            for l in self.locations:
+                if self.locations[l]["level"] == level:
+                    ret.append(l)
+        else:
+            for l in self.locations:
+                if self.locations[l]["level"] == "clinic" and self.locations[l]["case_report"] == 1:
+                    ret.append(l)
+            
+        return ret
         
 class LiveDownloader:
     """
@@ -173,11 +234,33 @@ class LiveDownloader:
 
     
     def download_structured_data(self, filename):
-        url = self.base_url + "/api/export/data"
+        """ Download stucutred data from url and saves it as a json file
+        
+        Args:
+            filename: name of file
+        """
+        url = self.base_url + "/api/export/data/1"
         params = {"api_key": self.api_key}
         download_file(url, filename, params=params)
-
+        
     def download_variables(self, filename):
-         url = self.base_url + "/api/variables/all"
-         params = {"api_key": self.api_key}
-         download_file(url, filename, params=params)
+        """ Download variables from url and saves it as a json file
+        
+        Args:
+            filename: name of file
+        """
+
+        url = self.base_url + "/api/variables/all"
+        params = {"api_key": self.api_key}
+        download_file(url, filename, params=params)
+         
+    def download_locations(self, filename):
+        """ Download location data from url and saves it as a json file
+        
+        Args:
+            filename: name of file
+        """
+        
+        url = self.base_url + "/api/locations"
+        params = {"api_key": self.api_key}
+        download_file(url, filename, params=params)

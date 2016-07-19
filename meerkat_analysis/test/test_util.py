@@ -1,5 +1,6 @@
 from unittest import mock
 import unittest
+
 import requests_mock
 import os
 import json
@@ -103,7 +104,7 @@ class LiveDownloaderTest(unittest.TestCase):
     @requests_mock.mock()
     def test_download_structured_data(self, mo):
         ld = util.LiveDownloader("http://test.test", api_key="test")
-        mo.get("http://test.test/api/export/data?api_key=test",
+        mo.get("http://test.test/api/export/data/1?api_key=test",
                text="This is a test")
         filename = "test.test"
         ld.download_structured_data(filename)
@@ -121,3 +122,30 @@ class LiveDownloaderTest(unittest.TestCase):
         with open(filename, "r") as f:
             self.assertEqual(f.read(), "This is a test")
         os.remove(filename)
+
+        
+class LocationsTest(unittest.TestCase):
+    """ Testing Locations class"""
+
+    def setUp(self):
+        with open("meerkat_analysis/test/test_data/locations.json") as f:
+            self.locations = json.loads(f.read())
+            
+    def test_init(self):
+        location = util.Locations(self.locations)
+        self.assertEqual(location.locations, self.locations)
+
+    def test_init_from_json_file(self):
+        location = util.Locations.from_json_file(
+            "meerkat_analysis/test/test_data/locations.json")
+        self.assertEqual(location.locations, self.locations)
+
+    @requests_mock.mock()
+    def test_init_from_url(self, mo):
+        ld = util.LiveDownloader("http://test.test", api_key="test")
+        mo.get("http://test.test/api/locations?api_key=test",
+               text=json.dumps(self.locations))
+        v = util.Locations.from_url(ld, "test.test")
+
+        self.assertEqual(v.locations, self.locations)
+        os.remove("test.test")

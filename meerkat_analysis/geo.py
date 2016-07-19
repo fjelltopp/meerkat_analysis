@@ -17,6 +17,7 @@ def incidence_rate_by_location(data, locations, var_id, level="clinic"):
 
     N = data.groupby(level).sum()[var_id]
     locs = locations.get_level(level)
+    print(locs)
     ret = pd.DataFrame(columns=["incidence_rate", "ci_lower", "ci_upper"])
     for l in locs:
         if int(l) in N.index:
@@ -27,5 +28,7 @@ def incidence_rate_by_location(data, locations, var_id, level="clinic"):
         confidence_interval = proportion.proportion_confint(n,
                                                             locations.population(l)
                                                             , method="wilson")
-        ret.loc[locations.name(l)] = [i, i-confidence_interval[0], confidence_interval[1] -i ]
+        ret.loc[locations.name(l)] = [i,
+                                      i - confidence_interval[0],
+                                      confidence_interval[1] - i]
     return ret

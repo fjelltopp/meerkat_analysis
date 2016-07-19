@@ -3,6 +3,7 @@ from statsmodels.stats import proportion
 from matplotlib import pylab
 
 from . import util
+
 def breakdown_by_category(variables, category, data, use_names=True):
     """
     Gives a breakdown of data for category
@@ -30,6 +31,40 @@ def breakdown_by_category(variables, category, data, use_names=True):
 
     return results
     
+def plot_timeline_by_category(variables, category, data, use_names=True, freq="W",
+                              smooth=True):
+    """
+    Gives a breakdown of data for category
+
+    Args:
+       variables: Variables class
+       category: name of category
+       data: structured data in pandas Data Frame
+       use_names: return object used variable names instead of ids
+    """
+    if category in ["country", "region", "district", "clinic"]:
+        return data[category].value_counts()
+
+    if category not in variables.groups:
+        raise KeyError("Category does not exists")
+
+    results = pd.DataFrame(columns=["value"])
+    ids = sorted(variables.groups[category])
+    fig = pylab.figure()
+    results = data.groupby(pd.Grouper(key="date", freq=freq)).sum()
+    for number, i in enumerate(ids):
+        if smooth:
+            if freq in ["1D", "D"]:
+                smooth_freq="1H"
+            else:
+                smooth_freq="1D"
+            results[i].resample(smooth_freq).interpolate(method="cubic").plot(
+                label=variables.name(i))
+        else:
+            results[i].plot(label=variables.name(i))
+    pylab.legend(loc="best")
+    pylab.show()
+    return fig
 
 def incidence_rate(data, population=None, var_id=None, name=None, variables=None, alpha=0.95):
     """

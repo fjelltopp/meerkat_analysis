@@ -149,3 +149,33 @@ class LocationsTest(unittest.TestCase):
 
         self.assertEqual(v.locations, self.locations)
         os.remove("test.test")
+        
+    def test_get_level(self):
+        location = util.Locations(self.locations)
+
+        clinics = location.get_level("clinic")
+        self.assertEqual(sorted(clinics), sorted(["7", "8", "10", "11"]))
+        
+        clinics = location.get_level("clinic", only_case_report=False)
+        self.assertEqual(sorted(clinics), sorted(["7", "8", "9", "10", "11"]))
+
+        districts = location.get_level("district")
+        self.assertEqual(sorted(districts), sorted(["4", "5", "6"]))
+
+        regions = location.get_level("region")
+        self.assertEqual(sorted(regions), sorted(["2", "3"]))
+
+        regions = location.get_level("not_a_level")
+        self.assertEqual(sorted(regions), [])
+        
+    def test_name(self):
+        location = util.Locations(self.locations)
+        self.assertEqual(location.name("7"), "Clinic 1")
+        self.assertEqual(location.name(7), "Clinic 1")
+        self.assertEqual(location.name("Not a location"), None)
+
+    def test_population(self):
+        location = util.Locations(self.locations)
+        self.assertEqual(location.population("7"), 1500)
+        self.assertEqual(location.population(7), 1500)
+        self.assertEqual(location.population("Not a location"), 0)

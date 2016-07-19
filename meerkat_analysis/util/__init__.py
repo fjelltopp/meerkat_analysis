@@ -180,7 +180,12 @@ class Locations:
         """
         Returns the population
         """
-        return self.locations[loc_id]["population"]
+        ret = 0
+        if loc_id in self.locations:
+            ret = self.locations[loc_id]["population"]
+        elif str(loc_id) in self.locations:
+            ret = self.locations[str(loc_id)]["population"]
+        return ret
 
     def loc_id_from_name(self, name, district):
         """ 
@@ -194,13 +199,18 @@ class Locations:
         """
         Returns the name of the location
         """
-        return self.locations[loc_id]["name"]
+        ret = None
+        if loc_id in self.locations:
+            ret = self.locations[loc_id]["name"]
+        elif str(loc_id) in self.locations:
+            ret = self.locations[str(loc_id)]["name"]
+        return ret
     def get_level(self, level, only_case_report=True):
         """
         Returns all the locations with the correct level
         """
         ret = []
-        if level != "clinic" and not only_case_report:
+        if level != "clinic" or not only_case_report:
             for l in self.locations:
                 if self.locations[l]["level"] == level:
                     ret.append(l)

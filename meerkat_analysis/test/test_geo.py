@@ -27,4 +27,17 @@ class GeoTest(unittest.TestCase):
         
         self.assertEqual(ci,
                          proportion.proportion_confint(1, 1500, method="wilson"))
-        
+        rates = geo.incidence_rate_by_location(data,
+                                               locations,
+                                               "gen_1",
+                                               level="district").fillna(0)
+        self.assertEqual(rates.loc["District 1"]["incidence_rate"], 2 / 2500)
+        self.assertEqual(rates.loc["District 2"]["incidence_rate"], 0 )
+        self.assertEqual(rates.loc["District 3"]["incidence_rate"], 2 / 2000)
+
+        rates = geo.incidence_rate_by_location(data,
+                                               locations,
+                                               "gen_1",
+                                               level="region").fillna(0)
+        self.assertEqual(rates.loc["Region 1"]["incidence_rate"], 2 / 6500)
+        self.assertEqual(rates.loc["Region 2"]["incidence_rate"], 2 / 2000 )

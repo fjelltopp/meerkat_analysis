@@ -50,21 +50,20 @@ def plot_timeline_by_category(variables, category, data, use_names=True, freq="W
 
     results = pd.DataFrame(columns=["value"])
     ids = sorted(variables.groups[category])
-    fig = pylab.figure()
+    fig, ax = pylab.subplots()
     results = data.groupby(pd.Grouper(key="date", freq=freq)).sum()
     for number, i in enumerate(ids):
         if smooth:
             if freq in ["1D", "D"]:
-                smooth_freq="1H"
+                smooth_freq = "1H"
             else:
-                smooth_freq="1D"
+                smooth_freq = "1D"
             results[i].resample(smooth_freq).interpolate(method="cubic").plot(
-                label=variables.name(i))
+                label=variables.name(i), ax=ax)
         else:
-            results[i].plot(label=variables.name(i))
+            results[i].plot(label=variables.name(i), ax=ax)
     pylab.legend(loc="best")
-    pylab.show()
-    return fig
+    return ax
 
 def incidence_rate(data, population=None, var_id=None, name=None, variables=None, alpha=0.95):
     """

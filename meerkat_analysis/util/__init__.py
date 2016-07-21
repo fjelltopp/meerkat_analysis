@@ -220,6 +220,38 @@ class Locations:
                     ret.append(l)
             
         return ret
+    def get_clinics(self, loc_id):
+        """
+        Returns the clincs that are sublocations to the given location
+        """
+        clinics = []
+        for l in self.locations.values():
+            if l["level"] == "clinic" and self.is_child(loc_id, l["id"]):
+                clinics.append(str(l["id"]))
+        return clinics
+                    
+    def is_child(self, parent, child):
+        """
+        Determines if child is child of parent
+        
+        Args:
+          parent: parent_id
+          child: child_id
+
+       Returns:
+          is_child(Boolean): True if child is child of parent
+        """
+        parent = str(parent)
+        child = str(child)
+        if child == parent or parent == "1":
+            return True
+        loc_id = child
+        while loc_id != "1":
+            loc_id = str(self.locations[loc_id]["parent_location"])
+            if loc_id == parent:
+                return True
+        return False
+
         
 class LiveDownloader:
     """

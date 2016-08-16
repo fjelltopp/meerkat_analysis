@@ -27,7 +27,10 @@ def breakdown_by_category(variables, category, data, use_names=True):
             name = variables.name(i)
         else:
             name = i
-        results.loc[name] = [data[i].sum()]
+        if i in data.columns:
+            results.loc[name] = [data[i].sum()]
+        else:
+            results.loc[name] = [0]
 
     return results
     
@@ -58,8 +61,9 @@ def plot_timeline_by_category(variables, category, data, use_names=True, freq="W
                 smooth_freq = "1H"
             else:
                 smooth_freq = "1D"
-            results[i].resample(smooth_freq).interpolate(method="cubic").plot(
-                label=variables.name(i), ax=ax)
+            if i in results.columns:
+                results[i].resample(smooth_freq).interpolate(method="cubic").plot(
+                    label=variables.name(i), ax=ax)
         else:
             results[i].plot(label=variables.name(i), ax=ax)
     pylab.legend(loc="best")

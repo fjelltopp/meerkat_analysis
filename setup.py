@@ -16,8 +16,7 @@ setup(
     version='0.0.1',
     long_description=__doc__,
     packages=find_packages(),
-    include_package_data=True,
-    zip_safe=False,
+    package_data={'meerkat_analysis': ['style/*']},
     install_requires=reqs,
     test_suite='meerkat_analysis.test'
 )

@@ -1,0 +1,50 @@
+
+# Font family and size
+font.size: 12.0
+font.family: sans-serif
+text.color: 333333
+text.usetex: False
+
+# Set bg color to white and edge color(axis) to grey
+axes.facecolor: white #eaeaf2 
+axes.edgecolor:  939393 #white #333333
+axes.linewidth: 1
+axes.grid: True
+axes.titlesize: xx-large
+axes.labelsize: large
+axes.labelcolor: 333333
+axes.axisbelow: True
+
+# Default Colours
+axes.prop_cycle: cycler('color', ["0090CA", "D9692A", "89B6A5", "e94f37", "393e41", "F1E8B8", "CDEDF6", "690500", "77477B", "40476D","042A2B" ])
+
+lines.linewidth : 4
+lines.markersize : 10
+legend.edgecolor: 333333
+
+# Ticks
+xtick.labelsize : 14
+ytick.labelsize : 14
+xtick.color: 333333
+xtick.direction: in
+xtick.major.size: 0
+xtick.minor.size: 0
+ytick.color: 333333
+ytick.direction: in
+ytick.major.size: 0
+ytick.minor.size: 0
+
+# Remove top and right axis
+axes.spines.right : False
+axes.spines.top : False
+
+# Default white lines for pie chart
+patch.edgecolor: white
+
+# Colour and style of grid
+grid.color: c1c1c1
+grid.linestyle: -   # solid line
+
+figure.facecolor: white
+figure.edgecolor: 0.50
+figure.dpi: 120

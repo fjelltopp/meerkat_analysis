@@ -285,6 +285,16 @@ class LiveDownloader:
         params = {"api_key": self.api_key}
         download_file(url, filename, params=params)
         
+    def download_alerts(self, filename):
+        """ Download alerts from url and saves it as a json file
+        
+        Args:
+            filename: name of file
+        """
+        url = self.base_url + "/api/export/alerts"
+        params = {"api_key": self.api_key}
+        download_file(url, filename, params=params)
+        
     def download_variables(self, filename):
         """ Download variables from url and saves it as a json file
         

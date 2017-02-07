@@ -1,7 +1,7 @@
 import pandas as pd
+import numpy as np
 from datetime import datetime, timedelta
 from dateutil import parser
-from statsmodels.stats import proportion
 from matplotlib import pylab
 
 def fix_dates(start_date, end_date, epi_week_start_day):
@@ -75,7 +75,8 @@ def count_over_count(data, numerator_id, denominator_id, start_date=None, end_da
 
     Args: 
         data: data in dataframe
-        var_id: the variable id to count
+        denominator: the denominator id
+        numerator: the numerator_id 
         start_date: start date
         end_date: end_date
         epi_week_start_day: what day of the week to start the timeline(Mon=0)
@@ -88,6 +89,7 @@ def count_over_count(data, numerator_id, denominator_id, start_date=None, end_da
     if restrict:
         data = data[data[restrict] == 1]
     data = data[["date", numerator_id, denominator_id]]
+    data = data[data[denominator_id] == 1]
     if data[denominator_id].sum() == 0:
         proportion = 0
     else:
@@ -206,6 +208,39 @@ def number_of_sites(data, level, start_date=None, end_date=None,
     timeline = timeline.reindex(dates).fillna(0)
     return (total, timeline)
 
+
+def grouped_count_over_count(data, numerator, denominator, restrict=False,
+                             group_by="clinic", start_date=None, end_date=None,
+                             epi_week_start_day=None,
+                             fields=["region", "district", "clinic_type"]):
+    """
+    Returns the total count_over_count indicators per group_by, with fields.
+    Args:
+        data: data in dataframe
+        denominator: the denominator id
+        numerator: the numerator_id
+        start_date: start date
+        end_date: end_date
+        epi_week_start_day: what day of the week to start the timeline(Mon=0)
+        restrict: if true only data rows with denominator counts for numerator
+    Returns:
+       dataframe: With a row for each group by
+    """
+    
+    clinics = pd.DataFrame(columns=["score", "N"] + fields, index=[group_by])
+    for name, group in data.groupby(group_by):
+        if np.sum(group[denominator]) > 0:
+            row = [
+                count_over_count(group, numerator, denominator,
+                                 start_date=start_date, end_date=end_date,
+                                 epi_week_start_day=epi_week_start_day,
+                                 restrict=restrict)[0],
+                np.sum(group[denominator])
+            ]
+            for f in fields:
+                row.append(group[f][group.index[0]])
+            clinics.loc[name] = row
+    return clinics
 
 
 def plot_level_total(data, locations, level,  cutoff_per_week=None):

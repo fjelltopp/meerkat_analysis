@@ -35,7 +35,7 @@ def breakdown_by_category(variables, category, data, use_names=True):
     return results
     
 def plot_timeline_by_category(variables, category, data, use_names=True, freq="W",
-                              smooth=True):
+                              smooth=True, lw=1):
     """
     Gives a breakdown of data for category
 
@@ -63,9 +63,9 @@ def plot_timeline_by_category(variables, category, data, use_names=True, freq="W
                 smooth_freq = "1D"
             if i in results.columns:
                 results[i].resample(smooth_freq).interpolate(method="cubic").plot(
-                    label=variables.name(i), ax=ax)
+                    label=variables.name(i), ax=ax, lw=lw)
         else:
-            results[i].plot(label=variables.name(i), ax=ax)
+            results[i].plot(label=variables.name(i), ax=ax, lw=lw)
     pylab.legend(loc="best")
     return ax
 

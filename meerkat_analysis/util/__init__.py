@@ -2,7 +2,7 @@ import requests
 import os
 import csv
 import json
-
+import time
 
 def name_id(name=None, var_id=None, variables=None):
     """
@@ -23,7 +23,8 @@ def name_id(name=None, var_id=None, variables=None):
     else:
         raise KeyError("Need to provide either name or id")
 
-def download_file(url, filename, params=None):
+    
+def download_file(url, filename, params=None, cookies=None):
     """
     Download an url and saves it as file
 
@@ -37,10 +38,7 @@ def download_file(url, filename, params=None):
        IOError: if not status_code is 200
 
     """
-    if params:
-        req = requests.get(url, params=params)
-    else:
-        req = requests.get(url)
+    req = requests.get(url, params=params, cookies=cookies)
     if req.status_code == 200:
         with open(filename, "wb") as f:
             for line in req:
@@ -259,7 +257,7 @@ class LiveDownloader:
 
     """
 
-    def __init__(self, url, api_key=None):
+    def __init__(self, url, username=None, password=None):
         """
         Initialse the class with the url for the site and the api_key
 
@@ -268,22 +266,45 @@ class LiveDownloader:
             api_key: api_key to access the api
         """
         self.base_url = url
-        if api_key is None:
-            api_key = os.get("MEERKAT_ANALYSIS_API_KEY", None)
-            if api_key is None:
-                raise KeyError("No api_key proived as arugement or envrinomental variable MEERKAT_ANALYSIS_API_KEY")
-        self.api_key = api_key
+        if username is None or password is None:
+            raise KeyError("No username/password proived")
+        else:
+            if "localhost" in url:
+                auth_url = "http://localhost/auth/api/login"
+            else:
+                auth_url = "https://auth.emro.info/api/login"
+        auth_response = requests.post(auth_url, json={"password": password,
+                                                      "username": username
+                                                      })
+        print(auth_response)
+        if auth_response.status_code == 200:
+            self.cookies = auth_response.cookies
+        else:
+            raise IOError("Could not authorise with that username/password")
 
-    
     def download_structured_data(self, filename):
-        """ Download stucutred data from url and saves it as a json file
+        """ Download stucutred data from url and saves it as a csv file
         
         Args:
             filename: name of file
         """
         url = self.base_url + "/api/export/data/1"
-        params = {"api_key": self.api_key}
-        download_file(url, filename, params=params)
+        req = requests.get(url, cookies=self.cookies)
+        if req.status_code == 200:
+            uid = req.text[1:-2]
+            status = 0
+            while status == 0:
+                time.sleep(10)
+                req = requests.get(self.base_url + "/api/export/get_status/" + uid,
+                                   cookies=self.cookies)
+                res = json.loads(req.text)
+
+                status = res["status"]
+            if res["success"]:
+                download_file(self.base_url + "/api/export/get/" + uid,
+                              filename, cookies=self.cookies)
+            else:
+                print("Not successfull")
         
     def download_alerts(self, filename):
         """ Download alerts from url and saves it as a json file
@@ -292,8 +313,7 @@ class LiveDownloader:
             filename: name of file
         """
         url = self.base_url + "/api/export/alerts"
-        params = {"api_key": self.api_key}
-        download_file(url, filename, params=params)
+        download_file(url, filename, cookies=self.cookies)
         
     def download_variables(self, filename):
         """ Download variables from url and saves it as a json file
@@ -303,8 +323,7 @@ class LiveDownloader:
         """
 
         url = self.base_url + "/api/variables/all"
-        params = {"api_key": self.api_key}
-        download_file(url, filename, params=params)
+        download_file(url, filename, cookies=self.cookies)
          
     def download_locations(self, filename):
         """ Download location data from url and saves it as a json file
@@ -314,5 +333,4 @@ class LiveDownloader:
         """
         
         url = self.base_url + "/api/locations"
-        params = {"api_key": self.api_key}
-        download_file(url, filename, params=params)
+        download_file(url, filename, cookies=self.cookies)

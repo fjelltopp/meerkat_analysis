@@ -1,6 +1,6 @@
 
 # Font family and size
-font.size: 12.0
+font.size: 11.0
 font.family: sans-serif
 text.color: 333333
 text.usetex: False
@@ -16,15 +16,17 @@ axes.labelcolor: 333333
 axes.axisbelow: True
 
 # Default Colours
-axes.prop_cycle: cycler('color', ["0090CA", "D9692A", "89B6A5", "e94f37", "393e41", "F1E8B8", "CDEDF6", "690500", "77477B", "40476D","042A2B" ])
+axes.prop_cycle: cycler('color', ["0090CA", "D9692A", "89B6A5", "e94f37", "393e41", "690500", "77477B", "40476D","042A2B", "F1E8B8", "CDEDF6"])
 
-lines.linewidth : 4
+lines.linewidth : 1
 lines.markersize : 10
 legend.edgecolor: 333333
+legend.fancybox: True
+
 
 # Ticks
-xtick.labelsize : 14
-ytick.labelsize : 14
+xtick.labelsize : 11
+ytick.labelsize : 11
 xtick.color: 333333
 xtick.direction: in
 xtick.major.size: 0
@@ -40,6 +42,8 @@ axes.spines.top : False
 
 # Default white lines for pie chart
 patch.edgecolor: white
+
+errorbar.capsize : 3
 
 # Colour and style of grid
 grid.color: c1c1c1

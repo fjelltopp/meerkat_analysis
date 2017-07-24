@@ -68,8 +68,14 @@ class VariablesTest(unittest.TestCase):
         
     @requests_mock.mock()
     def test_init_from_url(self, mo):
-        ld = util.LiveDownloader("http://test.test", api_key="test")
-        mo.get("http://test.test/api/variables/all?api_key=test",
+        mo.post("https://auth.emro.info/api/login",
+               text="hei",
+        )
+        
+        ld = util.LiveDownloader("http://test.test", username="test",
+                                 password="password")
+ 
+        mo.get("http://test.test/api/variables/all",
                text=json.dumps(self.variables))
         v = util.Variables.from_url(ld, "test.test")
 
@@ -103,8 +109,18 @@ class LiveDownloaderTest(unittest.TestCase):
     """ Test LiveDownloader class """
     @requests_mock.mock()
     def test_download_structured_data(self, mo):
-        ld = util.LiveDownloader("http://test.test", api_key="test")
-        mo.get("http://test.test/api/export/data/1?api_key=test",
+        mo.post("https://auth.emro.info/api/login",
+                text="hei",
+        )
+        
+        ld = util.LiveDownloader("http://test.test",
+                                 password="password",
+                                 username="test")
+        mo.get("http://test.test/api/export/data/1",
+               text="a1234aa")
+        mo.get("http://test.test/api/export/get_status/1234",
+               text=json.dumps({"status": 1, "success": 1}))
+        mo.get("http://test.test/api/export/getcsv/1234",
                text="This is a test")
         filename = "test.test"
         ld.download_structured_data(filename)
@@ -114,8 +130,14 @@ class LiveDownloaderTest(unittest.TestCase):
         
     @requests_mock.mock()
     def test_download_variables(self, mo):
-        ld = util.LiveDownloader("http://test.test", api_key="test")
-        mo.get("http://test.test/api/variables/all?api_key=test",
+        mo.post("https://auth.emro.info/api/login",
+               text="hei",
+        )
+        
+        ld = util.LiveDownloader("http://test.test",
+                                 password="password",
+                                 username="test")
+        mo.get("http://test.test/api/variables/all",
                text="This is a test")
         filename = "test.test"
         ld.download_variables(filename)
@@ -142,8 +164,14 @@ class LocationsTest(unittest.TestCase):
 
     @requests_mock.mock()
     def test_init_from_url(self, mo):
-        ld = util.LiveDownloader("http://test.test", api_key="test")
-        mo.get("http://test.test/api/locations?api_key=test",
+
+        mo.post("https://auth.emro.info/api/login",
+               text="hei"
+        )
+        
+        ld = util.LiveDownloader("http://test.test", username="test",
+                                 password="password")
+        mo.get("http://test.test/api/locations",
                text=json.dumps(self.locations))
         v = util.Locations.from_url(ld, "test.test")
 

@@ -101,6 +101,7 @@ def incidence_rate_by_location(data, level, locations, variables, populations=No
     for loc in locations.get_level(level):
         if loc not in exclude:
             group_data = data[data[level] == int(loc)]
+            add = False
             if populations:
                 name = locations.name(loc)
                 if name in populations:
@@ -113,11 +114,16 @@ def incidence_rate_by_location(data, level, locations, variables, populations=No
 
 
                     raise KeyError("Populations needs to include either variable id or name")
-                incidence_rate = univariate.incidence_rate(group_data, population=population,
-                                                       var_id=var_id, name=name, variables=variables)
+
+                if population != 0:
+                    add = True
+                    incidence_rate = univariate.incidence_rate(group_data, population=population,
+                                                               var_id=var_id, name=name, variables=variables)
             else:
+                add = True
                 incidence_rate = univariate.incidence_rate(group_data, var_id=var_id, name=name, variables=variables)
-            ret.loc[locations.name(loc)] = [incidence_rate[0], incidence_rate[0]-incidence_rate[1][0], incidence_rate[1][1]-incidence_rate[0]]
+            if add:
+                ret.loc[locations.name(loc)] = [incidence_rate[0], incidence_rate[0]-incidence_rate[1][0], incidence_rate[1][1]-incidence_rate[0]]
     return ret
 
 

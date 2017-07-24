@@ -203,6 +203,21 @@ class Locations:
         elif str(loc_id) in self.locations:
             ret = self.locations[str(loc_id)]["name"]
         return ret
+
+    def populations(self, level):
+        """
+        Returns the populations for the given level
+
+        """
+
+
+        locs = self.get_level(level)
+        ret = {}
+        for l in locs:
+            ret[l] = self.population(l)
+        return ret
+        
+        
     def get_level(self, level, only_case_report=True):
         """
         Returns all the locations with the correct level
@@ -301,7 +316,7 @@ class LiveDownloader:
 
                 status = res["status"]
             if res["success"]:
-                download_file(self.base_url + "/api/export/get/" + uid,
+                download_file(self.base_url + "/api/export/getcsv/" + uid,
                               filename, cookies=self.cookies)
             else:
                 print("Not successfull")

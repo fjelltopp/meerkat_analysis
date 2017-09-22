@@ -11,12 +11,14 @@ class IndicatorTest(unittest.TestCase):
     def test_count(self):
         data = pd.read_csv("meerkat_analysis/test/test_data/univariate.csv", parse_dates=["date"]).fillna(0)
 
-        total, timeline = indicators.count(data, "gen_2",
+        total, timeline,mean,std_dev= indicators.count(data, "gen_2",
                                            epi_week_start_day=0,
                                            start_date="2016/1/1",
                                            end_date="2016/12/31")
         self.assertEqual(total, 6)
         self.assertEqual(timeline["2016/06/20"], 5)
+        self.assertEqual(mean,0.6)
+        self.assertEqual(std_dev,0.6)
         self.assertTrue(
             timeline.index.equals(
                 pd.date_range("2016/1/1", "2016/12/31", freq="W-MON")))
@@ -37,7 +39,7 @@ class IndicatorTest(unittest.TestCase):
     def test_number_per_week_clinic(self):
         data = pd.read_csv("meerkat_analysis/test/test_data/univariate.csv", parse_dates=["date"]).fillna(0)
         locations = util.Locations.from_json_file("meerkat_analysis/test/test_data/locations.json")
-        clinics = indicators.number_per_week_clinic(data, "tot_1", locations, 
+        clinics = indicators.number_per_week_clinic(data, "tot_1", locations,
                                                     epi_week_start_day=0,
                                                     start_date="2016/1/1",
                                                     end_date="2016/12/31")
@@ -57,11 +59,11 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(clinics.loc[11, "2016/06/13"], 3)
         self.assertEqual(clinics.loc[11, "2016/06/20"], 2)
         self.assertEqual(clinics.loc[11, "2016/06/27"], 0)
-        
+
     def test_clinic_to_level(self):
         data = pd.read_csv("meerkat_analysis/test/test_data/univariate.csv", parse_dates=["date"]).fillna(0)
         locations = util.Locations.from_json_file("meerkat_analysis/test/test_data/locations.json")
-        clinics = indicators.number_per_week_clinic(data, "tot_1", locations, 
+        clinics = indicators.number_per_week_clinic(data, "tot_1", locations,
                                                     epi_week_start_day=0,
                                                     start_date="2016/1/1",
                                                     end_date="2016/12/31")
@@ -87,8 +89,8 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(timeline["2016/06/20"], 3)
         self.assertTrue(
             timeline.index.equals(
-                pd.date_range("2016/1/1", "2016/12/31", freq="W-MON")))  
-    
+                pd.date_range("2016/1/1", "2016/12/31", freq="W-MON")))
+
     def test_fix_dates(self):
         start_date, end_date, freq = indicators.fix_dates("2016/4/3", "2016/5/9", 0)
         self.assertEqual(start_date, datetime(2016, 4, 3))
@@ -106,14 +108,8 @@ class IndicatorTest(unittest.TestCase):
             offset = 7 + offset
 
         expected_end_date = now - timedelta(days=offset)
-        
+
         self.assertEqual(end_date.year, expected_end_date.year)
         self.assertEqual(end_date.month, expected_end_date.month)
         self.assertEqual(end_date.day, expected_end_date.day)
         self.assertEqual(freq, "W-THU")
-
-        
-
-
-    
-    

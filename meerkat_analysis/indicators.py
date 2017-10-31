@@ -41,13 +41,23 @@ def fix_dates(start_date, end_date, epi_week_start_day):
     return start_date, end_date, freq
 
 
-def count(data, var_id, start_date=None, end_date=None, epi_week_start_day=None):
+def calculate(data, var_id,calc,start_date=None, end_date=None, epi_week_start_day=None):
     """
     We return the total count of var_id and a timeline by epi_week
 
     Args:
         data: data in dataframe
         var_id: the variable id to count
+        calc: the mathematical function to calculate
+        ot: overall total
+        om: overall mean
+        omin: overall minimum
+        omax: overall maximum
+        s: sum with respect to timeline
+        m: mean with respect to timeline
+        std: standard deviation with respect to timeline
+        mn: min deviation with respect to timeline
+        mx: maxdeviation with respect to timeline
         start_date: start date
         end_date: end_date
         epi_week_start_day: what day of the week to start the timeline(Mon=0)
@@ -60,20 +70,32 @@ def count(data, var_id, start_date=None, end_date=None, epi_week_start_day=None)
                                            epi_week_start_day)
 
     dates = pd.date_range(start_date, end_date, freq=freq, closed="left")
-
+    return_val=0.0
+    if calc==ot:
+        return_val=pd[var_id].sum()
+    if calc==om:
+        return_val=pd[var_id].mean()
+    if calc==omin:
+        return_val=pd[var_id].min()
+    if calc==omax:
+        return_val=pd[var_id].max()
     data = data[data["date"] >= start_date]
     data = data[data["date"] <= end_date]
-    total = data[var_id].sum()
-    #rowtotal=data.shape[0]
-    #mean=total/rowtotal
-    #mean=data[var_id].mean().mean()
-    #mean=data[var_id].values.std(ddof=1)
-    mean=data[var_id].mean()
-    std_dev=data[var_id].std()
+    if calc==s:
+        return_val = data[var_id].sum()
+    if calc==m:
+        return_val=data[var_id].mean()
+    if calc==std:
+        return_val=data[var_id].std()
+    if calc==mn:
+        return_val=data[var_id].min()
+    if calc==mx:
+        return_val=data[var_id].max()
     timeline = data.groupby(
         pd.TimeGrouper(key="date", freq=freq, label="left", closed="left")).sum()[var_id]
     timeline = timeline.reindex(dates).fillna(0)
-    return (total, timeline,mean,std_dev)
+
+    return (return_val, timeline)
 
 def count_over_count(data, numerator_id, denominator_id, start_date=None, end_date=None, epi_week_start_day=None, restrict=False):
     """

@@ -49,15 +49,6 @@ def calculate(data, var_id,calc,start_date=None, end_date=None, epi_week_start_d
         data: data in dataframe
         var_id: the variable id to count
         calc: the mathematical function to calculate
-        ot: overall total
-        om: overall mean
-        omin: overall minimum
-        omax: overall maximum
-        s: sum with respect to timeline
-        m: mean with respect to timeline
-        std: standard deviation with respect to timeline
-        mn: min deviation with respect to timeline
-        mx: maxdeviation with respect to timeline
         start_date: start date
         end_date: end_date
         epi_week_start_day: what day of the week to start the timeline(Mon=0)
@@ -71,28 +62,23 @@ def calculate(data, var_id,calc,start_date=None, end_date=None, epi_week_start_d
 
     dates = pd.date_range(start_date, end_date, freq=freq, closed="left")
     return_val=0.0
-    if calc==ot:
-        return_val=pd[var_id].sum()
-    if calc==om:
-        return_val=pd[var_id].mean()
-    if calc==omin:
-        return_val=pd[var_id].min()
-    if calc==omax:
-        return_val=pd[var_id].max()
     data = data[data["date"] >= start_date]
     data = data[data["date"] <= end_date]
-    if calc==s:
-        return_val = data[var_id].sum()
-    if calc==m:
-        return_val=data[var_id].mean()
-    if calc==std:
-        return_val=data[var_id].std()
-    if calc==mn:
-        return_val=data[var_id].min()
-    if calc==mx:
-        return_val=data[var_id].max()
+    calc =
+        {
+        "sum" = data[var_id].sum()
+        "mean" = data[var_id].mean()
+        "std" = data[var_id].std()
+        "avg" = data[var_id].avg()
+        "min" = data[var_id].min()
+        "max" = data[var_id].max()
+        }
+    return_val=data[var_id].agg(calc)
+    '''timeline = data.groupby(
+        pd.TimeGrouper(key="date", freq=freq, label="left", closed="left")).sum()[var_id]'''
     timeline = data.groupby(
-        pd.TimeGrouper(key="date", freq=freq, label="left", closed="left")).sum()[var_id]
+        pd.TimeGrouper(key="date", freq=freq, label="left", closed="left")).agg([var_id]:[min, max, sum,avg,std])
+
     timeline = timeline.reindex(dates).fillna(0)
 
     return (return_val, timeline)

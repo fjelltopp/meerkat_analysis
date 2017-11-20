@@ -63,7 +63,7 @@ def count(data, var_id, start_date=None, end_date=None, epi_week_start_day=None)
 
     data = data[data["date"] >= start_date]
     data = data[data["date"] <= end_date]
-    total = data[var_id].sum()
+    total = data[var_id].count()
     timeline = data.groupby(
         pd.TimeGrouper(key="date", freq=freq, label="left", closed="left")).sum()[var_id]
     timeline = timeline.reindex(dates).fillna(0)
@@ -88,22 +88,25 @@ def count_over_count(data, numerator_id, denominator_id, start_date=None, end_da
 
     if restrict:
         data = data[data[restrict] == 1]
-    data = data[["date", numerator_id, denominator_id]]
-    data = data[data[denominator_id] == 1]
-    if data[denominator_id].sum() == 0:
-        proportion = 0
-    else:
-        proportion = data[numerator_id].sum() / data[denominator_id].sum()
-#        ci = proportion.proportion_confint(data[numerator_id].sum(), data[denominator_id].sum(), method="wilson")
+    
     start_date, end_date, freq = fix_dates(start_date,
                                            end_date,
                                            epi_week_start_day)
-    
+    data.replace(0, np.nan, inplace=True)
     dates = pd.date_range(start_date, end_date, freq=freq, closed="left")
     data = data[data["date"] >= start_date]
     data = data[data["date"] <= end_date]
+    data = data[["date", numerator_id, denominator_id]]
+    data = data[data[denominator_id] == 1]
+    if data[denominator_id].count() == 0:
+        proportion = 0
+    else:
+        proportion = data[numerator_id].count() / data[denominator_id].count()
+#        ci = proportion.proportion_confint(data[numerator_id].sum(), data[denominator_id].sum(), method="wilson")
+
+    
     timeline = data.groupby(
-        pd.TimeGrouper(key="date", freq=freq, label="left", closed="left")).sum()
+        pd.TimeGrouper(key="date", freq=freq, label="left", closed="left")).count()
     timeline = timeline.reindex(dates).fillna(0)
     timeline.loc[timeline[denominator_id] == 0, denominator_id] = 1
     proportion_timeline = timeline[numerator_id] / timeline[denominator_id]

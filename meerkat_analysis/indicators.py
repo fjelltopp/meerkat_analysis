@@ -99,7 +99,7 @@ def count_over_count(data, numerator_id, denominator_id, start_date=None, end_da
     data = data[["date", numerator_id, denominator_id]]
     data = data[data[denominator_id] == 1]
     if data[denominator_id].count() == 0:
-        proportion = 0
+        proportion =  np.array([0.0])
     else:
         proportion = data[numerator_id].count() / data[denominator_id].count()
 #        ci = proportion.proportion_confint(data[numerator_id].sum(), data[denominator_id].sum(), method="wilson")

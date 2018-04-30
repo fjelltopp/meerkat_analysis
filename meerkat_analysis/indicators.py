@@ -58,12 +58,12 @@ def count(data, var_id, start_date=None, end_date=None, epi_week_start_day=None)
     start_date, end_date, freq = fix_dates(start_date,
                                            end_date,
                                            epi_week_start_day)
-    
+    print(level)
     dates = pd.date_range(start_date, end_date, freq=freq, closed="left")
 
     data = data[data["date"] >= start_date]
     data = data[data["date"] <= end_date]
-    total = data[var_id].count()
+    total = data[var_id].sum()
     timeline = data.groupby(
         pd.TimeGrouper(key="date", freq=freq, label="left", closed="left")).sum()[var_id]
     timeline = timeline.reindex(dates).fillna(0)
@@ -102,7 +102,7 @@ def count_over_count(data, numerator_id, denominator_id, start_date=None, end_da
         proportion =  np.array([0.0])
     else:
         proportion = data[numerator_id].count() / data[denominator_id].count()
-#        ci = proportion.proportion_confint(data[numerator_id].sum(), data[denominator_id].sum(), method="wilson")
+        #        ci = proportion.proportion_confint(data[numerator_id].sum(), data[denominator_id].sum(), method="wilson")
 
     
     timeline = data.groupby(
@@ -210,6 +210,16 @@ def number_of_sites(data, level, start_date=None, end_date=None,
             label="left", closed="left")).agg({level: pd.Series.nunique})[level]
     timeline = timeline.reindex(dates).fillna(0)
     return (total, timeline)
+
+
+def grouped_indicator(data, function,
+                      group_by,
+                      *args):
+
+    return_value = {}
+    for name, group in data.groupby(group_by):
+        return_value[name] = function(group, *args)
+    return return_value
 
 
 def grouped_count_over_count(data, numerator, denominator, restrict=False,

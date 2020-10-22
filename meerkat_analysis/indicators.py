@@ -2,7 +2,10 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from dateutil import parser
-from matplotlib import pylab
+try:
+    from matplotlib import pylab
+except ImportError:
+    pass
 
 def fix_dates(start_date, end_date, epi_week_start_day):
     """

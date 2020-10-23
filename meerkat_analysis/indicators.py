@@ -67,7 +67,7 @@ def count(data, var_id, start_date=None, end_date=None, epi_week_start_day=None)
     data = data[data["date"] <= end_date]
     total = data[var_id].sum()
     timeline = data.groupby(
-        pd.TimeGrouper(key="date", freq=freq, label="left", closed="left")).sum()[var_id]
+        pd.Grouper(key="date", freq=freq, label="left", closed="left")).sum()[var_id]
     timeline = timeline.reindex(dates).fillna(0)
     return (total, timeline)
 
@@ -108,7 +108,7 @@ def count_over_count(data, numerator_id, denominator_id, start_date=None, end_da
 
 
     timeline = data.groupby(
-        pd.TimeGrouper(key="date", freq=freq, label="left", closed="left")).count()
+        pd.Grouper(key="date", freq=freq, label="left", closed="left")).count()
     timeline = timeline.reindex(dates).fillna(0)
     timeline.loc[timeline[denominator_id] == 0, denominator_id] = 1
     proportion_timeline = timeline[numerator_id] / timeline[denominator_id]
@@ -164,7 +164,7 @@ def number_per_week_clinic(data, variable, locations,
 
     completeness = data.groupby(
         ["clinic",
-         pd.TimeGrouper(key="date", freq=freq, label="left")]
+         pd.Grouper(key="date", freq=freq, label="left")]
     ).sum().reindex(new_index)[variable].fillna(0).sort_index()
     return completeness
 
@@ -207,7 +207,7 @@ def number_of_sites(data, level, start_date=None, end_date=None,
     data = data[data["date"] <= end_date]
     total = data[level].nunique()
     timeline = data.groupby(
-        pd.TimeGrouper(
+        pd.Grouper(
             key="date", freq=freq,
             label="left", closed="left")).agg({level: pd.Series.nunique})[level]
     timeline = timeline.reindex(dates).fillna(0)
